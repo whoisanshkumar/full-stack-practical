@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Inventory</title>
+</head>
+<body>
+    <h1>Book Inventory</h1>
+
+    <form id="bookForm">
+        <input placeholder="Title" id="title" required>
+        <input placeholder="ISBN" id="isbn" required>
+        <input placeholder="Author" id="author">
+        <input placeholder="Price" id="price">
+        <button type="submit">Add Book</button>
+    </form>
+
+    <ul id="list"></ul>
+
+<script>
+const API = "http://localhost:5000/api/books";
+
+async function loadBooks() {
+    const res = await fetch(API);
+    const data = await res.json();
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    data.forEach(b => {
+        list.innerHTML += `<li>${b.title} - ₹${b.price}
+        <button onclick="deleteBook('${b._id}')">Delete</button></li>`;
+    });
+}
+
+async function deleteBook(id) {
+    await fetch(API + "/" + id, { method: 'DELETE' });
+    loadBooks();
+}
+
+document.getElementById('bookForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            title: title.value,
+            isbn: isbn.value,
+            author: author.value,
+            price: price.value
+        })
+    });
+    loadBooks();
+});
+
+loadBooks();
+</script>
+</body>
+</html>
